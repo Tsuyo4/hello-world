@@ -56,13 +56,10 @@ func (color *Color) Set( value interface{} ) *Color {
 	return color
 }
 
-
-func (color *Color) Copy( color2 *Color ) *Color {
-	color.R = color2.R
-	color.G = color2.G
-	color.B = color2.B
-
-	return color
+func (color *Color) SetScalar( scalar float64 )  {
+	color.R = scalar
+	color.G = scalar
+	color.B = scalar
 }
 
 func (color *Color) SetHex( hex int32) *Color {
@@ -120,10 +117,6 @@ func (color *Color) SetHSL( h float64, s float64, l float64) {
 		color.G = hue2rgb( q, p, h)
 		color.B = hue2rgb( q, p, h - 1.0 / 3.0)
 	}
-}
-
-func (color *Color) GetHex() int32 {
-	return int32(color.R * 255) << 16 ^ int32( color.G * 255 ) << 8 ^ int32( color.B * 255 ) << 0
 }
 
 func (color *Color) SetStyle( style string) {
@@ -221,6 +214,21 @@ func (color *Color) SetStyle( style string) {
 	
 }
 
+func (color *Color) Clone() *Color {
+	c := &Color{}
+	c.Copy(color)
+
+	return c
+}
+
+func (color *Color) Copy( color2 *Color ) *Color {
+	color.R = color2.R
+	color.G = color2.G
+	color.B = color2.B
+
+	return color
+}
+
 func (color *Color) CopyGammaToLinear( color2 *Color, gammaFactor float64) *Color {
 	color.R = math.Pow( color2.R, gammaFactor )
 	color.G = math.Pow( color2.G, gammaFactor )
@@ -264,27 +272,13 @@ func (color *Color) ConvertLinearToGamma() *Color {
 	return color
 }
 
-func (color *Color) Clone() *Color {
-	c := &Color{}
-	c.Copy(color)
 
-	return c
-}
-
-func (color *Color) Lerp( color2 *Color, alpha float64) *Color {
-	color.R += ( color2.R - color.R ) * alpha
-	color.G += ( color2.G - color.G ) * alpha
-	color.B += ( color2.B - color.B ) * alpha
-
-	return color
+func (color *Color) GetHex() int32 {
+	return int32(color.R * 255) << 16 ^ int32( color.G * 255 ) << 8 ^ int32( color.B * 255 ) << 0
 }
 
 func (color *Color) GetHexString() string {
 	return fmt.Sprintf("%06x", color.GetHex())
-}
-
-func (color *Color) GetStyle() string {
-	return fmt.Sprintf("rgb(%d,%d,%d)",int32(color.R*255), int32(color.G*255), int32(color.B*255))
 }
 
 func (color *Color) GetHSL() *HSL {
@@ -331,6 +325,10 @@ func (color *Color) GetHSL() *HSL {
 	return hsl
 }
 
+func (color *Color) GetStyle() string {
+	return fmt.Sprintf("rgb(%d,%d,%d)",int32(color.R*255), int32(color.G*255), int32(color.B*255))
+}
+
 func (color *Color) OffsetHSL( h, s, l float64) *Color {
 
 	var hsl = color.GetHSL()
@@ -340,6 +338,14 @@ func (color *Color) OffsetHSL( h, s, l float64) *Color {
 	hsl.L += l
 
 	color.SetHSL(hsl.H, hsl.S, hsl.L)
+
+	return color
+}
+
+func (color *Color) Lerp( color2 *Color, alpha float64) *Color {
+	color.R += ( color2.R - color.R ) * alpha
+	color.G += ( color2.G - color.G ) * alpha
+	color.B += ( color2.B - color.B ) * alpha
 
 	return color
 }
@@ -378,13 +384,20 @@ func (color *Color) Multiply( color2 *Color) *Color {
 	return color
 }
 
+func (color *Color) MultiplyScalar( scalar float64 ) *Color {
+	color.R *= scalar
+	color.G *= scalar
+	color.B *= scalar
+
+	return color
+}
 
 func (color *Color) Equals( color2 *Color) bool {
 	return (color.R == color2.R) && (color.G == color2.G) && (color.B == color2.B)
 	
 }
 
-func (color *Color) FromArray( array [3]float64) {
+func (color *Color) FromArray( array []float64) {
 	color.R = array[0]
 	color.G = array[1]
 	color.B = array[2]
